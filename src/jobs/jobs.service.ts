@@ -9,27 +9,34 @@ import { CreateJobDto } from './dtos/createJobDto';
 export class JobsService {
   constructor(@InjectModel(Job.name) private jobModel: Model<JobDocument>) {}
 
-  async createJob(createJobDto: CreateJobDto): Promise<Job> {
-    const createdJob = new this.jobModel(createJobDto);
-    return createdJob.save();
-  }
-
   async findAllJobs(limit: number): Promise<Job[]> {
     const results = await this.jobModel
       .find()
       .sort({ dataInserimento: -1 })
       .limit(limit)
       .exec();
-    if(results.length == 0) {
-        throw new NotFoundException(`No results found`);
+    if (results.length == 0) {
+      throw new NotFoundException(`No results found`);
     }
     return results;
   }
 
-  async findJobsByText(text: string): Promise<Job[]> {
+  async createJob(createJobDto: CreateJobDto): Promise<Job> {
+    const createdJob = new this.jobModel(createJobDto);
+    return createdJob.save();
+  }
+
+  async findJobsByText(text: string, limit: number): Promise<Job[]> {
+    console.warn(limit);
     const results = await this.jobModel
-      .find({ titolo: new RegExp(text, 'i') } || { dataInserimento: new RegExp(text, 'i')})
-      .sort({ dataInserimentoRichiesta: -1 })
+      .find({
+        $or: [
+          { titolo: new RegExp(text, 'i') },
+          { descrizioneBreve: new RegExp(text, 'i') },
+        ],
+      })
+      .sort({ dataInserimento: -1 })
+      .limit(limit)
       .exec();
     if (results.length == 0) {
       throw new NotFoundException(`No results found`);

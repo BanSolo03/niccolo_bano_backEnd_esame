@@ -8,19 +8,19 @@ import { JobsService } from './jobs.service';
 export class JobsController {
     constructor(private readonly jobsService: JobsService) {}
 
-  @Post()
-  async createJob(@Body() createJobDto: CreateJobDto): Promise<Job> {
-    return this.jobsService.createJob(createJobDto);
-  }
-
   @Get()
   async findAllJobs(@Query('limit') limit: number): Promise<Job[]> {
     return this.jobsService.findAllJobs(limit);
   }
 
+  @Post('new')
+  async createJob(@Body() createJobDto: CreateJobDto): Promise<Job> {
+    return this.jobsService.createJob(createJobDto);
+  }
+
   @Get('search')
-  async findJobsByText(@Query('name') name: string): Promise<Job[]> {
-    return this.jobsService.findJobsByText(name);
+  async findJobsByText(@Query('text') name: string, @Query('limit') limit: number): Promise<Job[]> {
+    return this.jobsService.findJobsByText(name, limit);
   }
 
   @Post(':id')
